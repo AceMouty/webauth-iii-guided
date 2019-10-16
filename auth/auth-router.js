@@ -1,7 +1,26 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
-
+// bring in jwt
+const jwt = require('jsonwebtoken');
 const Users = require('../users/users-model.js');
+
+// Create a JWT
+function generateToken(usr){
+  
+  const payload = {
+    subject: usr.id,
+    username: usr.username,
+  }
+
+  const secret = "keep it a secret, keep it safe!"
+
+  const options = {
+    expiresIn: "1h",
+  }
+
+
+  return jwt.sign(payload, secret, options)
+}
 
 // for endpoints beginning with /api/auth
 router.post('/register', (req, res) => {
@@ -25,8 +44,14 @@ router.post('/login', (req, res) => {
     .first()
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
+        
+        // create a token
+        const token = generateToken(user)
+
+        // add token to the res
         res.status(200).json({
           message: `Welcome ${user.username}!`,
+          token: token // add in the created token
         });
       } else {
         res.status(401).json({ message: 'Invalid Credentials' });
