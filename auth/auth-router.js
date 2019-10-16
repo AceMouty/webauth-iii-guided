@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 // bring in jwt
 const jwt = require('jsonwebtoken');
+const jwtConfig = require('../config/secrets')
 const Users = require('../users/users-model.js');
 
 // Create a JWT
@@ -12,14 +13,12 @@ function generateToken(usr){
     username: usr.username,
   }
 
-  const secret = "keep it a secret, keep it safe!"
-
   const options = {
     expiresIn: "1h",
   }
 
 
-  return jwt.sign(payload, secret, options)
+  return jwt.sign(payload, jwtConfig.jwtSecret, options)
 }
 
 // for endpoints beginning with /api/auth
